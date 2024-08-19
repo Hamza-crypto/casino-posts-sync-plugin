@@ -12,10 +12,8 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-use We_Cpt_Betting_Site as CptBettingSite;
-use We_Cpt_Betting_Site_Meta_Keys as MetaKeys;
-use We_Taxonomy as Taxonomy;
-use We_M_Betting_Site as BettingSite;
+
+
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/includes/primary_import.php';

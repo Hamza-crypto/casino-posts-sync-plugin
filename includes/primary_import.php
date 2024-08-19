@@ -1,5 +1,10 @@
 <?php
 
+use We_M_Betting_Site as BettingSite;
+use We_Cpt_Betting_Site as CptBettingSite;
+use We_Cpt_Betting_Site_Meta_Keys as MetaKeys;
+use We_Taxonomy as Taxonomy;
+
 function primary_import(array $betting_site_data): void
 {
     $BettingSite_slug = 'wecptbs';
@@ -50,6 +55,12 @@ function primary_import(array $betting_site_data): void
         'available_languages' => $available_languages,
         'customer_support' => $customer_support,
 ];
+
+    // Add prefix to all meta keys
+    $meta_keys = array_combine(
+        array_map(fn ($key) => $key_prefix . $key, array_keys($meta_keys)),
+        array_values($meta_keys)
+    );
 
     if (! empty($betting_site_data['Image'])) {
         $betting_site->set_post_thumbnail($betting_site_data['Image']);

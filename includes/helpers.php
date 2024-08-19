@@ -37,7 +37,7 @@ function parse_available_languages($language)
     }
 }
 
-function parse_customer_support(string $value): void
+function parse_customer_support(string $value)
 {
     $customer_support = array();
     $raw_value_parts  = explode(",", $value);
@@ -50,6 +50,5 @@ function parse_customer_support(string $value): void
     }
     if (! empty($customer_support)) {
         return $customer_support;
-        carbon_set_post_meta($this->post->ID, MetaKeys::customer_support_key(), $customer_support);
     }
 }
