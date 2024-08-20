@@ -9,29 +9,45 @@ function primary_import1(array $betting_site_data): void
 {
     $BettingSite_slug = 'wecptbs';
     $betting_site_slug = sanitize_title($betting_site_data['Name']);
-    $existing_post     = get_page_by_path($betting_site_slug, OBJECT, $BettingSite_slug);
 
-    // If the post already exists, return early
-    if ($existing_post) {
+
+    // Query for existing posts by path
+    $existing_posts = get_posts(array(
+        'title'          => trim($betting_site_data['Name']),
+        'post_type'      => $BettingSite_slug,
+        'post_status'    => array('publish', 'draft'), // Include draft and other statuses
+        'posts_per_page' => 1, // We only need one post
+    ));
+
+    // If the post already exists, ignore it
+    if (!empty($existing_posts)) {
+
+        $existing_post = $existing_posts[0];
+        // If the post is in draft status, update it to publish
+        if ($existing_post->post_status === 'draft') {
+
+            wp_update_post(array(
+                'ID'          => $existing_post->ID,
+                'post_status' => 'publish'
+            ));
+        }
         return;
     }
 
-    $existing_post_id  = empty($existing_post) ? 0 : $existing_post->ID;
-    $post_args         = array(
-        'ID'          => $existing_post_id,
+
+    // Create a new post if it does not exist
+    $post_args = array(
         'post_title'  => trim($betting_site_data['Name']),
-        'post_status' => 'draft',
+        'post_status' => 'publish', // or 'publish' if you want to create the post as published
         'post_type'   => $BettingSite_slug,
     );
 
-    $post_id           = wp_insert_post($post_args);
-    if (empty($existing_post_id)) {
-        $post_args['ID'] = $post_id;
-        wp_update_post($post_args);
-    }
+
+    $post_id = wp_insert_post($post_args);
     $post = get_post($post_id);
 
     $betting_site = new BettingSite($post);
+
 
     $betting_site_logo_bg_color = ! empty($betting_site_data['Style']) ? trim(str_replace("background-color:", "", $betting_site_data['Style'])) : '';
     $title_and_subtitle = extract_review_title_and_subtitle($betting_site_data['Title'] ?? '');
@@ -71,7 +87,6 @@ function primary_import1(array $betting_site_data): void
 
     // Create/update meta keys for the post
     foreach ($meta_keys as $meta_key => $meta_value) {
-        dump($meta_key, $meta_value);
         update_post_meta($post_id, $meta_key, $meta_value);
     }
 
@@ -233,7 +248,7 @@ function secondary_import1(array $betting_site_data): void
             $result = $available_countries;
         }
 
-        update_post_meta($betting_site->post->ID, 'websf_countries', $all_bonus);
+        update_post_meta($betting_site->post->ID, 'websf_countries', $result);
     }
 
     if (! empty($betting_site_data['Disclaimer'])) {
