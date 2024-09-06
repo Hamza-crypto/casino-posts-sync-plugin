@@ -19,31 +19,21 @@ function primary_import1(array $betting_site_data): void
         'posts_per_page' => 1, // We only need one post
     ));
 
-    // If the post already exists, ignore it
+
+    // If the post already exists, get the ID
     if (!empty($existing_posts)) {
-
-        $existing_post = $existing_posts[0];
-        // If the post is in draft status, update it to publish
-        if ($existing_post->post_status === 'draft') {
-
-            wp_update_post(array(
-                'ID'          => $existing_post->ID,
-                'post_status' => 'publish'
-            ));
-        }
-        return;
+        $post_id = $existing_posts[0]->ID; // Use the existing post ID
+    } else {
+        // Create a new post if it doesn't exist
+        $post_args = array(
+            'post_title'  => trim($betting_site_data['Name']),
+            'post_status' => 'publish', // Create post as published
+            'post_type'   => $BettingSite_slug,
+        );
+        $post_id = wp_insert_post($post_args); // Insert the new post and get its ID
     }
 
 
-    // Create a new post if it does not exist
-    $post_args = array(
-        'post_title'  => trim($betting_site_data['Name']),
-        'post_status' => 'publish', // or 'publish' if you want to create the post as published
-        'post_type'   => $BettingSite_slug,
-    );
-
-
-    $post_id = wp_insert_post($post_args);
     $post = get_post($post_id);
 
     $betting_site = new BettingSite($post);
