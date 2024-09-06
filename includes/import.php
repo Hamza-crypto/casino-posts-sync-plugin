@@ -66,6 +66,7 @@ function primary_import1(array $betting_site_data): void
         'slots' => !empty($betting_site_data['Number Of Slots']) ? $betting_site_data['Number Of Slots'] : '',
         'available_languages' => $available_languages,
         'customer_support' => $customer_support,
+        '_websf_featured_bonus|link|0|0|value' => !empty($betting_site_data['Affiliate Link']) ? $betting_site_data['Affiliate Link'] : '', //Added By Hamza
     ];
 
     // Add prefix to all meta keys
