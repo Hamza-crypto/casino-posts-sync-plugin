@@ -41,10 +41,10 @@ function custom_import_endpoint_handler(WP_REST_Request $request)
     foreach ($payload as $betting_site_data) {
 
         if (!empty($betting_site_data['Name'])) {
-            primary_import1($betting_site_data);
+            $post_id = primary_import1($betting_site_data);
         }
         if (!empty($betting_site_data['Affiliate Link'])) {
-            secondary_import1($betting_site_data);
+            secondary_import1($betting_site_data, $post_id);
         }
     }
 

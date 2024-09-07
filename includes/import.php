@@ -5,7 +5,7 @@ use We_Cpt_Betting_Site as CptBettingSite;
 use We_Cpt_Betting_Site_Meta_Keys as MetaKeys;
 use We_Taxonomy as Taxonomy;
 
-function primary_import1(array $betting_site_data): void
+function primary_import1(array $betting_site_data)
 {
     $BettingSite_slug = 'wecptbs';
     $betting_site_slug = sanitize_title($betting_site_data['Name']);
@@ -66,7 +66,6 @@ function primary_import1(array $betting_site_data): void
         'slots' => !empty($betting_site_data['Number Of Slots']) ? $betting_site_data['Number Of Slots'] : '',
         'available_languages' => $available_languages,
         'customer_support' => $customer_support,
-        '_websf_featured_bonus|link|0|0|value' => !empty($betting_site_data['Affiliate Link']) ? $betting_site_data['Affiliate Link'] : '', //Added By Hamza
     ];
 
     // Add prefix to all meta keys
@@ -156,10 +155,12 @@ function primary_import1(array $betting_site_data): void
     }
 
     $betting_site->set_bonus($betting_site_data);
+
+    return $post_id;
 }
 
 
-function secondary_import1(array $betting_site_data): void
+function secondary_import1(array $betting_site_data, $post_id): void
 {
 
     $BettingSite_slug = 'wecptbs';
@@ -169,10 +170,9 @@ function secondary_import1(array $betting_site_data): void
     if (empty($existing_post)) {
         return;
     }
-
     $betting_site = new BettingSite($existing_post);
-    if (! empty($betting_site_data['Affiliate link'])) {
-        $link = wp_http_validate_url($betting_site_data['Affiliate link']);
+    if (! empty($betting_site_data['Affiliate Link'])) {
+        $link = wp_http_validate_url($betting_site_data['Affiliate Link']);
         if (! empty($link)) {
             $categories = $betting_site->get_categories();
             $all_bonus  = array();
@@ -247,4 +247,9 @@ function secondary_import1(array $betting_site_data): void
 
         update_post_meta($betting_site->post->ID, 'websf_play_terms', $disclaimer);
     }
+
+    if (! empty($betting_site_data['Affiliate Link'])) {
+        update_post_meta($post_id, '_websf_featured_bonus|link|0|0|value', $betting_site_data['Affiliate Link']);
+    }
+
 }
